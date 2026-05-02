@@ -1,0 +1,955 @@
+Build a full-stack advanced cybersecurity dork library website.
+
+Project goal:
+Create a visually modern, interactive website that collects, categorizes, stores, searches, and displays Google dork-style cybersecurity search patterns from multiple public sources such as GitHub, Medium RSS, security blogs, RSS feeds, and manual admin submissions.
+
+Important:
+Do not include real dangerous targets or real leaked secrets. Use placeholders like example.com, {domain}, {company}, {keyword}, {filetype}, {technology}. The app should support cybersecurity learning, OSINT organization, exposure monitoring, and authorized research workflows.
+
+Use this tech stack:
+
+Frontend:
+- Next.js
+- TypeScript
+- Tailwind CSS
+- shadcn/ui
+- Framer Motion
+- Lucide React icons
+- React Hook Form
+- Zod validation
+- TanStack Query
+- Zustand for lightweight state
+- Mermaid.js for visual diagrams
+- Recharts for analytics charts
+
+Backend:
+- Next.js API routes or server actions
+- PostgreSQL database
+- Prisma ORM
+- NextAuth.js or Auth.js for authentication
+- bcrypt for password hashing
+- Redis-compatible queue design if available, otherwise mock queue using database job table
+
+AI:
+- OpenAI-compatible API integration
+- Use AI for:
+  - extracting dork-like patterns from raw content
+  - generating clean titles
+  - generating descriptions
+  - categorizing dorks
+  - suggesting tags
+  - detecting duplicate/similar dorks
+  - creating normalized query templates with placeholders
+  - generating related dork suggestions
+- Make AI provider configurable using environment variables:
+  - AI_API_KEY
+  - AI_MODEL
+  - AI_BASE_URL optional
+
+External data sources:
+- GitHub API integration for searching public repositories and markdown files
+- RSS feed parser for blogs and Medium feeds
+- Manual source URL submission
+- Manual dork submission form
+- CSV/JSON import interface
+
+Search:
+- PostgreSQL full-text search for MVP
+- Filters by:
+  - category
+  - subcategory
+  - tag
+  - platform
+  - operator
+  - difficulty
+  - intent type
+  - source type
+  - date discovered
+- Search suggestions and autocomplete
+
+Core features:
+1. Public homepage
+2. Category explorer
+3. Nested category tree
+4. Advanced dork search page
+5. Dork detail page
+6. Trending dorks page
+7. Recently discovered page
+8. Collections/bookmarks
+9. Admin dashboard
+10. Source management
+11. Ingestion jobs page
+12. Raw content viewer
+13. Extracted dork review page
+14. AI categorization page
+15. Dork version history
+16. Analytics dashboard
+17. Mermaid ER diagram page
+18. Responsive mobile-friendly design
+
+Database schema:
+Use Prisma with PostgreSQL.
+
+Models needed:
+
+User:
+- id
+- username
+- email
+- passwordHash
+- role: ADMIN, EDITOR, USER
+- isActive
+- createdAt
+- updatedAt
+
+Category:
+- id
+- parentCategoryId nullable
+- name
+- slug
+- description
+- icon
+- color
+- depthLevel
+- displayOrder
+- isActive
+- createdAt
+- updatedAt
+
+Dork:
+- id
+- primaryCategoryId
+- createdById nullable
+- title
+- queryTemplate
+- optimizedQuery
+- description
+- usageContext
+- intentType
+- difficulty
+- sourceType
+- status: DRAFT, PUBLISHED, ARCHIVED
+- viewsCount
+- copyCount
+- createdAt
+- updatedAt
+
+DorkCategory:
+- dorkId
+- categoryId
+
+Tag:
+- id
+- name
+- slug
+- tagType
+- description
+
+DorkTag:
+- dorkId
+- tagId
+
+Source:
+- id
+- name
+- sourceType: GITHUB, RSS, MEDIUM, BLOG, MANUAL, IMPORT
+- baseUrl
+- fetchMethod
+- isActive
+- createdAt
+- updatedAt
+
+IngestionJob:
+- id
+- sourceId
+- jobType
+- status: PENDING, RUNNING, COMPLETED, FAILED
+- startedAt
+- finishedAt
+- itemsFound
+- itemsProcessed
+- errorMessage
+
+RawContent:
+- id
+- sourceId
+- jobId nullable
+- title
+- rawText
+- sourceUrl
+- contentHash
+- discoveredAt
+- createdAt
+
+ExtractedDork:
+- id
+- rawContentId
+- rawQuery
+- normalizedQuery
+- optimizedQuery
+- extractedTitle
+- detectedCategory
+- detectedIntent
+- confidenceScore
+- processingStatus: NEW, PROCESSED, IMPORTED, IGNORED
+- createdAt
+
+DorkVersion:
+- id
+- dorkId
+- queryTemplate
+- optimizedQuery
+- description
+- versionLabel
+- changeReason
+- changedById nullable
+- changedAt
+
+Operator:
+- id
+- name
+- syntax
+- description
+- exampleUsage
+
+DorkOperator:
+- dorkId
+- operatorId
+
+Platform:
+- id
+- name
+- slug
+- platformType
+- description
+
+DorkPlatform:
+- dorkId
+- platformId
+
+Collection:
+- id
+- userId
+- title
+- description
+- visibility: PRIVATE, PUBLIC
+- createdAt
+- updatedAt
+
+CollectionItem:
+- collectionId
+- dorkId
+- displayOrder
+- notes
+
+Bookmark:
+- id
+- userId
+- dorkId
+- folderName
+- createdAt
+
+Rating:
+- id
+- userId
+- dorkId
+- score
+- feedback
+- createdAt
+
+Comment:
+- id
+- userId
+- dorkId
+- commentBody
+- status
+- createdAt
+- updatedAt
+
+SearchLog:
+- id
+- userId nullable
+- searchQuery
+- selectedCategory
+- selectedIntent
+- selectedDifficulty
+- searchedAt
+
+Use these top-level categories and nested categories:
+
+Red Team:
+- Reconnaissance
+- Public asset discovery
+- Subdomain discovery
+- Technology fingerprinting
+- Exposed login panels
+- Public documents
+- Employee footprinting
+- Infrastructure discovery
+- Attack surface mapping
+- Reporting
+
+Blue Team:
+- Exposure monitoring
+- Public asset monitoring
+- Sensitive file exposure
+- Exposed admin panels
+- Threat hunting
+- Phishing indicators
+- Incident response
+- Detection engineering
+- Brand protection
+- Compliance monitoring
+
+Network Security:
+- Open ports
+- Indexed port banners
+- Remote access ports
+- Database ports
+- Management ports
+- Development ports
+- Services
+- Web services
+- Remote desktop services
+- VPN portals
+- Mail services
+- Storage services
+- Network devices
+- Routers
+- Firewalls
+- Switches
+- Load balancers
+- Wireless controllers
+- IP cameras
+- Printers
+- Pivoting research
+- Public jump-host references
+- Bastion host references
+- Internal hostname leakage
+- Network map exposure
+- Defensive review
+- Internet-facing inventory
+- Asset ownership mapping
+- Segmentation evidence
+
+Web Security:
+- Application discovery
+- Login pages
+- Admin panels
+- API endpoints
+- Staging sites
+- Dev environments
+- File exposure
+- Backup files
+- Config files
+- Log files
+- Archive files
+- Framework specific
+- WordPress
+- Laravel
+- Django
+- Flask
+- React
+- Next.js
+- Spring Boot
+- API security
+- Swagger docs
+- GraphQL endpoints
+- OpenAPI specs
+- Error and debug data
+- Stack traces
+- Debug pages
+- Environment variable references
+
+Cloud Security:
+- AWS
+- S3 indicators
+- CloudFront assets
+- IAM references
+- Azure
+- Blob storage indicators
+- Azure AD references
+- App Service exposure
+- Google Cloud
+- Cloud Storage indicators
+- Firebase references
+- Cloud Run services
+- Kubernetes
+- Dashboard references
+- Kubeconfig references
+- Helm charts
+- Container registry references
+- SaaS security
+- Public Notion pages
+- Public Google Docs
+- Public Trello boards
+- Public Jira issues
+- Cloud monitoring
+- Public dashboards
+- Metrics endpoints
+- Logging exposure
+
+AI Security:
+- AI asset discovery
+- Public AI applications
+- Chatbot interfaces
+- AI API gateways
+- Model demo pages
+- AI documentation pages
+- LLM application security
+- Prompt injection research
+- System prompt exposure indicators
+- Plugin and tool exposure
+- Agent workflow references
+- RAG application surfaces
+- Model and dataset exposure
+- Public model files
+- Dataset references
+- Training data leakage indicators
+- Embedding store references
+- Vector database references
+- AI infrastructure
+- Jupyter notebooks
+- MLflow dashboards
+- TensorBoard dashboards
+- Ray dashboards
+- GPU monitoring panels
+- AI supply chain
+- Model registry references
+- Hugging Face references
+- AI package dependencies
+- Public inference endpoints
+- Fine-tuning artifact references
+- Defensive AI monitoring
+- Shadow AI detection
+- Sensitive prompt leakage
+- Unsafe output reports
+- AI usage inventory
+- AI governance
+- Model cards
+- Dataset cards
+- Responsible AI policies
+- Compliance evidence
+
+OSINT:
+- Organization research
+- Domains
+- Subsidiaries
+- Acquisitions
+- Public contacts
+- Public infrastructure
+- People research
+- Employee profiles
+- Public resumes
+- Conference talks
+- Email pattern discovery
+- Document intelligence
+- PDFs
+- Spreadsheets
+- Presentations
+- Metadata
+- Public reports
+- Code intelligence
+- Public repositories
+- Package metadata
+- Commit references
+
+Threat Intelligence:
+- IOC discovery
+- Domains
+- IP references
+- File hashes
+- URLs
+- Email addresses
+- Phishing research
+- Fake login pages
+- Brand abuse
+- Scam pages
+- Malware infrastructure
+- Infrastructure references
+- Compromised host indicators
+- Campaign tracking
+- Actor aliases
+- Malware family names
+- TTP references
+
+Vulnerability Research:
+- CVE research
+- Vendor advisories
+- Exploit references
+- Affected products
+- Patch status pages
+- Technology fingerprinting
+- Version disclosure
+- Server banners
+- Framework versions
+- Plugin versions
+- Research references
+- Security advisories
+- GitHub references
+- Responsible disclosure reports
+- Patch verification
+- Old version discovery
+- Deprecated software
+- End-of-life systems
+
+Compliance and Audit:
+- Data exposure
+- PII references
+- PHI references
+- PCI-related references
+- Legal documents
+- Financial records
+- Policy violations
+- Public confidential documents
+- Internal-only documents
+- HR records
+- Regulatory mapping
+- GDPR
+- HIPAA
+- PCI DSS
+- ISO 27001
+- SOC 2
+- Evidence management
+- Finding screenshots
+- Review status
+- Owner assignment
+- Remediation tracking
+
+Digital Forensics and Incident Response:
+- Leak investigation
+- Public breach references
+- Exposed logs
+- Exposed archives
+- Public incident mentions
+- Compromise assessment
+- Defacement checks
+- Suspicious indexed files
+- Malware references
+- IOC references
+- Evidence discovery
+- Cached pages
+- Historical references
+- Remediation tracking
+
+DevSecOps:
+- Source code exposure
+- Public repositories
+- Commit history
+- Configuration files
+- Dependency files
+- CI/CD security
+- Build logs
+- Pipeline configs
+- Runner references
+- Deployment artifacts
+- Secrets management
+- Token indicators
+- Environment variable references
+- Key file references
+- Container security
+- Docker files
+- Container registries
+- Kubernetes manifests
+- Helm charts
+- Infrastructure as code
+- Terraform files
+- CloudFormation files
+- Ansible playbooks
+
+Identity and Access Security:
+- Authentication surfaces
+- Login portals
+- SSO pages
+- MFA pages
+- Password reset pages
+- Directory exposure
+- Public user lists
+- Employee directories
+- Role-based accounts
+- Group references
+- Cloud identity
+- Azure AD references
+- IAM policy references
+- Service accounts
+- OAuth apps
+- Access reviews
+- Public permission documents
+- Shared drive exposure
+- External collaborator references
+- Brand and account abuse
+- Fake login pages
+- Impersonation pages
+
+Mobile Security:
+- Mobile app discovery
+- APK references
+- iOS app references
+- Mobile API endpoints
+- Firebase references
+- App configuration exposure
+- Mobile backend discovery
+
+IoT and OT Security:
+- IoT devices
+- Cameras
+- Printers
+- Routers
+- Industrial control references
+- SCADA references
+- Building management references
+- Device dashboards
+- Firmware references
+
+Learning and Labs:
+- Beginner dorks
+- Basic operators
+- Safe practice examples
+- Public documentation search
+- Defensive labs
+- Exposure monitoring
+- Brand monitoring
+- Cloud review
+- Red team labs
+- Recon workflow
+- Asset discovery
+- Reporting practice
+- AI security labs
+- Prompt security
+- Dataset exposure awareness
+- CTF and practice
+- Intentionally vulnerable labs
+- Training notes
+
+AI processing pipeline:
+Create services/functions for:
+
+1. fetchSources()
+- Fetch latest content from configured sources.
+- GitHub: search public repositories and markdown files based on keywords.
+- RSS: parse articles.
+- Manual: allow admin to paste raw text or URLs.
+- Store all fetched text in RawContent.
+- Deduplicate using contentHash.
+
+2. extractDorkCandidates(rawText)
+- Detect dork-like search patterns.
+- Look for common search operator structures such as site:, filetype:, intitle:, inurl:, intext:, ext:, cache:, related:.
+- Extract candidate queries.
+- Store in ExtractedDork.
+
+3. normalizeDork(rawQuery)
+- Trim spaces.
+- Standardize operator casing.
+- Replace real domains with placeholders where appropriate.
+- Remove duplicate operators.
+- Convert into queryTemplate.
+
+4. categorizeDork(normalizedQuery, context)
+- Use AI to classify into category, subcategory, intentType, difficulty, tags, platforms, and operators.
+
+5. optimizeDork(normalizedQuery, category)
+- Create a cleaner and more readable version.
+- Do not generate real targets.
+- Use placeholders.
+- Add useful metadata.
+- Generate title and explanation.
+- Suggest related dorks.
+
+6. importExtractedDork(extractedDorkId)
+- Convert ExtractedDork into Dork.
+- Create DorkVersion.
+- Link categories, tags, operators, and platforms.
+
+Pages to build:
+
+Public pages:
+- /
+  - Hero section
+  - Search bar
+  - Animated category cards
+  - Stats cards: total dorks, categories, sources, recent discoveries
+  - Trending dorks
+  - Recently discovered
+  - AI Security spotlight section
+- /categories
+  - Interactive nested category tree
+  - Category cards
+  - Search inside categories
+- /categories/[slug]
+  - Category detail
+  - Subcategories
+  - Dork list
+  - Filters
+- /dorks
+  - Advanced search
+  - Filters sidebar
+  - Sort by newest, popular, copied, difficulty
+  - Grid/list toggle
+- /dorks/[id]
+  - Dork title
+  - Query template
+  - Optimized query
+  - Copy button
+  - Description
+  - Usage context
+  - Category breadcrumbs
+  - Tags
+  - Operators
+  - Platforms
+  - Related dorks
+  - Version history
+- /trending
+- /recent
+- /collections
+- /about
+
+Admin pages:
+- /admin
+  - Dashboard stats
+  - Ingestion status
+  - Recent extracted dorks
+  - Source health
+  - Charts
+- /admin/sources
+  - Add/edit/delete sources
+  - Run ingestion job
+- /admin/ingestion
+  - View jobs
+  - Status
+  - Logs
+- /admin/raw-content
+  - View fetched raw content
+  - Search raw content
+- /admin/extracted-dorks
+  - View extracted candidates
+  - Run AI categorization
+  - Import as dork
+  - Ignore candidate
+- /admin/dorks
+  - CRUD dorks
+- /admin/categories
+  - CRUD nested categories
+  - Drag/drop reorder if possible
+- /admin/tags
+- /admin/operators
+- /admin/platforms
+- /admin/analytics
+- /admin/diagrams
+  - Show Mermaid ER diagram and system flow diagram
+
+Design requirements:
+- Dark cyberpunk-inspired theme
+- Clean professional UI, not childish
+- Gradient cards
+- Glassmorphism panels
+- Smooth Framer Motion animations
+- Category icons
+- Risk-free placeholders in examples
+- Syntax-highlighted query boxes
+- Copy-to-clipboard buttons
+- Toast notifications
+- Responsive design
+- Sidebar navigation for admin
+- Command palette search
+- Empty states
+- Loading skeletons
+
+Seed data:
+Create seed script with:
+- Admin user
+- All categories listed above
+- Common Google search operators:
+  - site:
+  - filetype:
+  - ext:
+  - intitle:
+  - allintitle:
+  - inurl:
+  - allinurl:
+  - intext:
+  - allintext:
+  - cache:
+  - related:
+  - before:
+  - after:
+- Platforms:
+  - Google Search
+  - GitHub
+  - Medium
+  - AWS
+  - Azure
+  - Google Cloud
+  - Kubernetes
+  - WordPress
+  - Jira
+  - Notion
+  - Trello
+  - Firebase
+  - Hugging Face
+  - Jupyter
+  - MLflow
+- Sample placeholder dorks only, such as:
+  - site:{domain} filetype:pdf "{keyword}"
+  - site:{domain} intitle:"login"
+  - site:{domain} inurl:admin
+  - site:{domain} filetype:log
+  - site:{domain} inurl:api
+  - site:{domain} "{technology}" "{keyword}"
+  - site:{domain} filetype:json "{keyword}"
+  - site:{domain} inurl:docs
+  - site:{domain} intitle:"dashboard"
+  - site:{domain} "{ai_tool}" "{keyword}"
+
+Do not seed real secrets, real targets, or exploit instructions.
+
+API routes:
+- GET /api/dorks
+- POST /api/dorks
+- GET /api/dorks/:id
+- PUT /api/dorks/:id
+- DELETE /api/dorks/:id
+- GET /api/categories
+- POST /api/categories
+- GET /api/tags
+- GET /api/operators
+- GET /api/platforms
+- GET /api/search?q=
+- POST /api/sources
+- GET /api/sources
+- POST /api/ingestion/run
+- GET /api/ingestion/jobs
+- GET /api/raw-content
+- POST /api/extract
+- POST /api/ai/categorize
+- POST /api/ai/optimize
+- POST /api/extracted-dorks/:id/import
+- POST /api/bookmarks
+- GET /api/bookmarks
+- POST /api/collections
+- GET /api/collections
+- GET /api/analytics
+
+Mermaid ER diagram page:
+Include this diagram in /admin/diagrams:
+
+erDiagram
+    USER ||--o{ DORK : creates
+    USER ||--o{ COLLECTION : owns
+    USER ||--o{ BOOKMARK : saves
+    USER ||--o{ RATING : rates
+    USER ||--o{ COMMENT : writes
+    USER ||--o{ SEARCH_LOG : performs
+
+    CATEGORY ||--o{ CATEGORY : has_subcategories
+    CATEGORY ||--o{ DORK : primary_category
+    CATEGORY ||--o{ DORK_CATEGORY : classifies
+    DORK ||--o{ DORK_CATEGORY : belongs_to
+
+    SOURCE ||--o{ INGESTION_JOB : runs
+    SOURCE ||--o{ RAW_CONTENT : provides
+    INGESTION_JOB ||--o{ RAW_CONTENT : discovers
+    RAW_CONTENT ||--o{ EXTRACTED_DORK : contains
+
+    DORK ||--o{ DORK_VERSION : has_versions
+    DORK ||--o{ DORK_TAG : has
+    TAG ||--o{ DORK_TAG : labels
+
+    DORK ||--o{ DORK_OPERATOR : uses
+    OPERATOR ||--o{ DORK_OPERATOR : appears_in
+
+    DORK ||--o{ DORK_PLATFORM : targets
+    PLATFORM ||--o{ DORK_PLATFORM : mapped_to
+
+    DORK ||--o{ COLLECTION_ITEM : added_to
+    COLLECTION ||--o{ COLLECTION_ITEM : contains
+
+    DORK ||--o{ BOOKMARK : bookmarked_in
+    DORK ||--o{ RATING : receives
+    DORK ||--o{ COMMENT : has
+
+System flow diagram:
+flowchart TD
+    A[Public Sources] --> B[Ingestion Layer]
+    A1[GitHub] --> B
+    A2[Medium RSS] --> B
+    A3[Security Blogs] --> B
+    A4[RSS Feeds] --> B
+    A5[Manual Submissions] --> B
+    B --> C[Raw Content Storage]
+    C --> D[Pattern Extractor]
+    D --> E[Dork Normalizer]
+    E --> F[Duplicate Detection]
+    F --> G[AI Categorization Engine]
+    G --> H[Dork Optimization Engine]
+    H --> I[Versioning System]
+    I --> J[Main Dork Library]
+    J --> K[Search UI]
+    J --> L[Category Explorer]
+    J --> M[Trending Dorks]
+    J --> N[Related Dork Suggestions]
+
+Environment variables:
+- DATABASE_URL
+- NEXTAUTH_SECRET
+- NEXTAUTH_URL
+- AI_API_KEY
+- AI_MODEL
+- AI_BASE_URL
+- GITHUB_TOKEN optional
+
+Implementation details:
+- Generate Prisma schema.
+- Generate migrations.
+- Generate seed script.
+- Build all main pages.
+- Build reusable components:
+  - DorkCard
+  - QueryBox
+  - CategoryTree
+  - CategoryCard
+  - SearchFilters
+  - AdminSidebar
+  - StatsCard
+  - SourceStatusCard
+  - IngestionJobTable
+  - RawContentViewer
+  - ExtractedDorkTable
+  - MermaidDiagram
+  - CopyButton
+  - TagBadge
+  - DifficultyBadge
+  - OperatorBadge
+- Use server-side pagination for dorks and raw content.
+- Add loading states and error handling.
+- Add authentication and protect admin routes.
+- Admin user can manage everything.
+- Normal users can search, bookmark, rate, comment, and create collections.
+
+AI prompt templates inside the code:
+
+Extraction prompt:
+“You are an assistant that extracts Google search query patterns from cybersecurity educational content. Return JSON only. Extract candidate queries, surrounding context, detected operators, and confidence score. Replace specific real domains or sensitive values with placeholders such as {domain}, {keyword}, {technology}, or {filetype}.”
+
+Categorization prompt:
+“Classify this query template into the cybersecurity taxonomy. Return JSON with primaryCategory, subcategories, intentType, difficulty, tags, platforms, operators, title, and short description.”
+
+Optimization prompt:
+“Normalize and improve this query template for readability and search relevance. Keep placeholders. Do not insert real targets. Return JSON with queryTemplate, optimizedQuery, title, description, tags, and relatedVariants.”
+
+Expected final output:
+A working Replit project with:
+- installable dependencies
+- database schema
+- seed data
+- responsive frontend
+- admin dashboard
+- ingestion pipeline
+- AI integration stubs
+- source fetching stubs
+- advanced search
+- category explorer
+- Mermaid diagrams
+- clean cyber-themed UI
+
+Start by creating the project structure, installing dependencies, defining the Prisma schema, then building the UI and API routes.
