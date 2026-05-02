@@ -1,22 +1,49 @@
 openapi: 3.1.0
 info:
-  # Do not change the title, if the title changes, the import paths will be broken
   title: Api
   version: 0.1.0
-  description: API specification
+  description: Cybersecurity Dork Library API
 servers:
   - url: /api
     description: Base API path
 tags:
   - name: health
     description: Health operations
+  - name: dorks
+    description: Dork management
+  - name: categories
+    description: Category management
+  - name: tags
+    description: Tag management
+  - name: operators
+    description: Operator management
+  - name: platforms
+    description: Platform management
+  - name: search
+    description: Search operations
+  - name: sources
+    description: Source management
+  - name: ingestion
+    description: Ingestion job management
+  - name: rawContent
+    description: Raw content management
+  - name: extractedDorks
+    description: Extracted dork management
+  - name: ai
+    description: AI operations
+  - name: bookmarks
+    description: Bookmark management
+  - name: collections
+    description: Collection management
+  - name: analytics
+    description: Analytics
+
 paths:
   /healthz:
     get:
       operationId: healthCheck
       tags: [health]
       summary: Health check
-      description: Returns server health status
       responses:
         "200":
           description: Healthy
@@ -24,6 +51,969 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/HealthStatus"
+
+  /dorks:
+    get:
+      operationId: listDorks
+      tags: [dorks]
+      summary: List dorks with filters and pagination
+      parameters:
+        - name: page
+          in: query
+          schema:
+            type: integer
+            default: 1
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            default: 20
+        - name: category
+          in: query
+          schema:
+            type: string
+        - name: tag
+          in: query
+          schema:
+            type: string
+        - name: platform
+          in: query
+          schema:
+            type: string
+        - name: operator
+          in: query
+          schema:
+            type: string
+        - name: difficulty
+          in: query
+          schema:
+            type: string
+        - name: intentType
+          in: query
+          schema:
+            type: string
+        - name: sourceType
+          in: query
+          schema:
+            type: string
+        - name: status
+          in: query
+          schema:
+            type: string
+        - name: sortBy
+          in: query
+          schema:
+            type: string
+            enum: [newest, popular, copied, difficulty]
+            default: newest
+        - name: q
+          in: query
+          schema:
+            type: string
+      responses:
+        "200":
+          description: List of dorks
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DorkListResponse"
+    post:
+      operationId: createDork
+      tags: [dorks]
+      summary: Create a new dork
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateDorkBody"
+      responses:
+        "201":
+          description: Created dork
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Dork"
+
+  /dorks/{id}:
+    get:
+      operationId: getDork
+      tags: [dorks]
+      summary: Get a dork by ID
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Dork detail
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DorkDetail"
+    put:
+      operationId: updateDork
+      tags: [dorks]
+      summary: Update a dork
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateDorkBody"
+      responses:
+        "200":
+          description: Updated dork
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Dork"
+    delete:
+      operationId: deleteDork
+      tags: [dorks]
+      summary: Delete a dork
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "204":
+          description: Deleted
+
+  /dorks/trending:
+    get:
+      operationId: getTrendingDorks
+      tags: [dorks]
+      summary: Get trending dorks
+      parameters:
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            default: 10
+      responses:
+        "200":
+          description: Trending dorks
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Dork"
+
+  /dorks/recent:
+    get:
+      operationId: getRecentDorks
+      tags: [dorks]
+      summary: Get recently discovered dorks
+      parameters:
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            default: 10
+      responses:
+        "200":
+          description: Recent dorks
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Dork"
+
+  /dorks/{id}/related:
+    get:
+      operationId: getRelatedDorks
+      tags: [dorks]
+      summary: Get related dorks
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            default: 5
+      responses:
+        "200":
+          description: Related dorks
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Dork"
+
+  /dorks/{id}/versions:
+    get:
+      operationId: getDorkVersions
+      tags: [dorks]
+      summary: Get version history for a dork
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Dork versions
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/DorkVersion"
+
+  /dorks/{id}/copy:
+    post:
+      operationId: recordDorkCopy
+      tags: [dorks]
+      summary: Record a dork copy event
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Copy recorded
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SuccessResponse"
+
+  /categories:
+    get:
+      operationId: listCategories
+      tags: [categories]
+      summary: List all categories with nested structure
+      parameters:
+        - name: flat
+          in: query
+          schema:
+            type: boolean
+            default: false
+      responses:
+        "200":
+          description: Category list
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Category"
+    post:
+      operationId: createCategory
+      tags: [categories]
+      summary: Create a category
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateCategoryBody"
+      responses:
+        "201":
+          description: Created category
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Category"
+
+  /categories/{slug}:
+    get:
+      operationId: getCategoryBySlug
+      tags: [categories]
+      summary: Get category by slug with subcategories and dork count
+      parameters:
+        - name: slug
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Category detail
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CategoryDetail"
+
+  /categories/{id}:
+    put:
+      operationId: updateCategory
+      tags: [categories]
+      summary: Update a category
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateCategoryBody"
+      responses:
+        "200":
+          description: Updated category
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Category"
+    delete:
+      operationId: deleteCategory
+      tags: [categories]
+      summary: Delete a category
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "204":
+          description: Deleted
+
+  /tags:
+    get:
+      operationId: listTags
+      tags: [tags]
+      summary: List all tags
+      responses:
+        "200":
+          description: Tag list
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Tag"
+    post:
+      operationId: createTag
+      tags: [tags]
+      summary: Create a tag
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateTagBody"
+      responses:
+        "201":
+          description: Created tag
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Tag"
+
+  /operators:
+    get:
+      operationId: listOperators
+      tags: [operators]
+      summary: List all operators
+      responses:
+        "200":
+          description: Operator list
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Operator"
+    post:
+      operationId: createOperator
+      tags: [operators]
+      summary: Create an operator
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateOperatorBody"
+      responses:
+        "201":
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Operator"
+
+  /platforms:
+    get:
+      operationId: listPlatforms
+      tags: [platforms]
+      summary: List all platforms
+      responses:
+        "200":
+          description: Platform list
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Platform"
+    post:
+      operationId: createPlatform
+      tags: [platforms]
+      summary: Create a platform
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreatePlatformBody"
+      responses:
+        "201":
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Platform"
+
+  /search:
+    get:
+      operationId: searchDorks
+      tags: [search]
+      summary: Full-text search with filters
+      parameters:
+        - name: q
+          in: query
+          required: true
+          schema:
+            type: string
+        - name: category
+          in: query
+          schema:
+            type: string
+        - name: tag
+          in: query
+          schema:
+            type: string
+        - name: difficulty
+          in: query
+          schema:
+            type: string
+        - name: intentType
+          in: query
+          schema:
+            type: string
+        - name: page
+          in: query
+          schema:
+            type: integer
+            default: 1
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            default: 20
+      responses:
+        "200":
+          description: Search results
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SearchResponse"
+
+  /search/suggestions:
+    get:
+      operationId: getSearchSuggestions
+      tags: [search]
+      summary: Get search autocomplete suggestions
+      parameters:
+        - name: q
+          in: query
+          required: true
+          schema:
+            type: string
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            default: 5
+      responses:
+        "200":
+          description: Suggestions
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: string
+
+  /sources:
+    get:
+      operationId: listSources
+      tags: [sources]
+      summary: List sources
+      responses:
+        "200":
+          description: Source list
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Source"
+    post:
+      operationId: createSource
+      tags: [sources]
+      summary: Create a source
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateSourceBody"
+      responses:
+        "201":
+          description: Created source
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Source"
+
+  /sources/{id}:
+    put:
+      operationId: updateSource
+      tags: [sources]
+      summary: Update a source
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateSourceBody"
+      responses:
+        "200":
+          description: Updated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Source"
+    delete:
+      operationId: deleteSource
+      tags: [sources]
+      summary: Delete a source
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "204":
+          description: Deleted
+
+  /ingestion/run:
+    post:
+      operationId: runIngestionJob
+      tags: [ingestion]
+      summary: Trigger an ingestion job
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/RunIngestionBody"
+      responses:
+        "202":
+          description: Job started
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/IngestionJob"
+
+  /ingestion/jobs:
+    get:
+      operationId: listIngestionJobs
+      tags: [ingestion]
+      summary: List ingestion jobs
+      parameters:
+        - name: page
+          in: query
+          schema:
+            type: integer
+            default: 1
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            default: 20
+        - name: status
+          in: query
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Job list
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/IngestionJobListResponse"
+
+  /raw-content:
+    get:
+      operationId: listRawContent
+      tags: [rawContent]
+      summary: List raw content
+      parameters:
+        - name: page
+          in: query
+          schema:
+            type: integer
+            default: 1
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            default: 20
+        - name: sourceId
+          in: query
+          schema:
+            type: integer
+        - name: q
+          in: query
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Raw content list
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/RawContentListResponse"
+
+  /extract:
+    post:
+      operationId: extractDorks
+      tags: [extractedDorks]
+      summary: Extract dork candidates from raw content
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ExtractBody"
+      responses:
+        "200":
+          description: Extraction result
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ExtractResult"
+
+  /extracted-dorks:
+    get:
+      operationId: listExtractedDorks
+      tags: [extractedDorks]
+      summary: List extracted dork candidates
+      parameters:
+        - name: page
+          in: query
+          schema:
+            type: integer
+            default: 1
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            default: 20
+        - name: status
+          in: query
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Extracted dork list
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ExtractedDorkListResponse"
+
+  /extracted-dorks/{id}/import:
+    post:
+      operationId: importExtractedDork
+      tags: [extractedDorks]
+      summary: Import an extracted dork into the main library
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "201":
+          description: Imported dork
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Dork"
+
+  /extracted-dorks/{id}/ignore:
+    post:
+      operationId: ignoreExtractedDork
+      tags: [extractedDorks]
+      summary: Mark extracted dork as ignored
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Ignored
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SuccessResponse"
+
+  /ai/categorize:
+    post:
+      operationId: aiCategorizeDork
+      tags: [ai]
+      summary: AI categorization of a dork query
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/AiCategorizeBody"
+      responses:
+        "200":
+          description: Categorization result
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AiCategorizeResult"
+
+  /ai/optimize:
+    post:
+      operationId: aiOptimizeDork
+      tags: [ai]
+      summary: AI optimization of a dork query
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/AiOptimizeBody"
+      responses:
+        "200":
+          description: Optimization result
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AiOptimizeResult"
+
+  /bookmarks:
+    get:
+      operationId: listBookmarks
+      tags: [bookmarks]
+      summary: List bookmarks for current user
+      responses:
+        "200":
+          description: Bookmark list
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Bookmark"
+    post:
+      operationId: createBookmark
+      tags: [bookmarks]
+      summary: Create a bookmark
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateBookmarkBody"
+      responses:
+        "201":
+          description: Created bookmark
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Bookmark"
+
+  /bookmarks/{id}:
+    delete:
+      operationId: deleteBookmark
+      tags: [bookmarks]
+      summary: Delete a bookmark
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "204":
+          description: Deleted
+
+  /collections:
+    get:
+      operationId: listCollections
+      tags: [collections]
+      summary: List collections
+      responses:
+        "200":
+          description: Collection list
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Collection"
+    post:
+      operationId: createCollection
+      tags: [collections]
+      summary: Create a collection
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateCollectionBody"
+      responses:
+        "201":
+          description: Created collection
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Collection"
+
+  /collections/{id}:
+    get:
+      operationId: getCollection
+      tags: [collections]
+      summary: Get a collection with items
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Collection detail
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CollectionDetail"
+    delete:
+      operationId: deleteCollection
+      tags: [collections]
+      summary: Delete a collection
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "204":
+          description: Deleted
+
+  /analytics:
+    get:
+      operationId: getAnalytics
+      tags: [analytics]
+      summary: Get analytics overview
+      responses:
+        "200":
+          description: Analytics data
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AnalyticsData"
+
+  /analytics/stats:
+    get:
+      operationId: getStats
+      tags: [analytics]
+      summary: Get site stats (total dorks, categories, sources, recent discoveries)
+      responses:
+        "200":
+          description: Stats
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SiteStats"
+
+  /analytics/category-distribution:
+    get:
+      operationId: getCategoryDistribution
+      tags: [analytics]
+      summary: Get dork count by top-level category
+      responses:
+        "200":
+          description: Category distribution
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/CategoryCount"
+
+  /analytics/difficulty-breakdown:
+    get:
+      operationId: getDifficultyBreakdown
+      tags: [analytics]
+      summary: Get dork count by difficulty level
+      responses:
+        "200":
+          description: Difficulty breakdown
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/DifficultyCount"
+
+  /analytics/ingestion-activity:
+    get:
+      operationId: getIngestionActivity
+      tags: [analytics]
+      summary: Get ingestion activity over last 30 days
+      responses:
+        "200":
+          description: Ingestion activity
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/DailyActivity"
+
 components:
   schemas:
     HealthStatus:
@@ -31,6 +1021,759 @@ components:
       properties:
         status:
           type: string
-      required:
-        - status
+      required: [status]
 
+    SuccessResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+        message:
+          type: string
+      required: [success]
+
+    Dork:
+      type: object
+      properties:
+        id:
+          type: integer
+        title:
+          type: string
+        queryTemplate:
+          type: string
+        optimizedQuery:
+          type: string
+        description:
+          type: string
+        usageContext:
+          type: string
+        intentType:
+          type: string
+        difficulty:
+          type: string
+        sourceType:
+          type: string
+        status:
+          type: string
+        viewsCount:
+          type: integer
+        copyCount:
+          type: integer
+        primaryCategoryId:
+          type: integer
+        primaryCategory:
+          $ref: "#/components/schemas/Category"
+        tags:
+          type: array
+          items:
+            $ref: "#/components/schemas/Tag"
+        operators:
+          type: array
+          items:
+            $ref: "#/components/schemas/Operator"
+        platforms:
+          type: array
+          items:
+            $ref: "#/components/schemas/Platform"
+        categories:
+          type: array
+          items:
+            $ref: "#/components/schemas/Category"
+        createdAt:
+          type: string
+        updatedAt:
+          type: string
+      required: [id, title, queryTemplate, status, createdAt]
+
+    DorkDetail:
+      allOf:
+        - $ref: "#/components/schemas/Dork"
+        - type: object
+          properties:
+            versions:
+              type: array
+              items:
+                $ref: "#/components/schemas/DorkVersion"
+            relatedDorks:
+              type: array
+              items:
+                $ref: "#/components/schemas/Dork"
+
+    DorkListResponse:
+      type: object
+      properties:
+        dorks:
+          type: array
+          items:
+            $ref: "#/components/schemas/Dork"
+        total:
+          type: integer
+        page:
+          type: integer
+        limit:
+          type: integer
+        totalPages:
+          type: integer
+      required: [dorks, total, page, limit, totalPages]
+
+    CreateDorkBody:
+      type: object
+      properties:
+        title:
+          type: string
+        queryTemplate:
+          type: string
+        optimizedQuery:
+          type: string
+        description:
+          type: string
+        usageContext:
+          type: string
+        intentType:
+          type: string
+        difficulty:
+          type: string
+        sourceType:
+          type: string
+        status:
+          type: string
+        primaryCategoryId:
+          type: integer
+        categoryIds:
+          type: array
+          items:
+            type: integer
+        tagIds:
+          type: array
+          items:
+            type: integer
+        operatorIds:
+          type: array
+          items:
+            type: integer
+        platformIds:
+          type: array
+          items:
+            type: integer
+      required: [title, queryTemplate]
+
+    DorkVersion:
+      type: object
+      properties:
+        id:
+          type: integer
+        dorkId:
+          type: integer
+        queryTemplate:
+          type: string
+        optimizedQuery:
+          type: string
+        description:
+          type: string
+        versionLabel:
+          type: string
+        changeReason:
+          type: string
+        changedAt:
+          type: string
+      required: [id, dorkId, changedAt]
+
+    Category:
+      type: object
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+        slug:
+          type: string
+        description:
+          type: string
+        icon:
+          type: string
+        color:
+          type: string
+        depthLevel:
+          type: integer
+        displayOrder:
+          type: integer
+        isActive:
+          type: boolean
+        parentCategoryId:
+          type: integer
+        dorkCount:
+          type: integer
+        subcategories:
+          type: array
+          items:
+            $ref: "#/components/schemas/Category"
+        createdAt:
+          type: string
+      required: [id, name, slug, depthLevel]
+
+    CategoryDetail:
+      allOf:
+        - $ref: "#/components/schemas/Category"
+        - type: object
+          properties:
+            recentDorks:
+              type: array
+              items:
+                $ref: "#/components/schemas/Dork"
+
+    CreateCategoryBody:
+      type: object
+      properties:
+        name:
+          type: string
+        slug:
+          type: string
+        description:
+          type: string
+        icon:
+          type: string
+        color:
+          type: string
+        parentCategoryId:
+          type: integer
+        displayOrder:
+          type: integer
+      required: [name, slug]
+
+    Tag:
+      type: object
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+        slug:
+          type: string
+        tagType:
+          type: string
+        description:
+          type: string
+        dorkCount:
+          type: integer
+      required: [id, name, slug]
+
+    CreateTagBody:
+      type: object
+      properties:
+        name:
+          type: string
+        slug:
+          type: string
+        tagType:
+          type: string
+        description:
+          type: string
+      required: [name, slug]
+
+    Operator:
+      type: object
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+        syntax:
+          type: string
+        description:
+          type: string
+        exampleUsage:
+          type: string
+        dorkCount:
+          type: integer
+      required: [id, name, syntax]
+
+    CreateOperatorBody:
+      type: object
+      properties:
+        name:
+          type: string
+        syntax:
+          type: string
+        description:
+          type: string
+        exampleUsage:
+          type: string
+      required: [name, syntax]
+
+    Platform:
+      type: object
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+        slug:
+          type: string
+        platformType:
+          type: string
+        description:
+          type: string
+        dorkCount:
+          type: integer
+      required: [id, name, slug]
+
+    CreatePlatformBody:
+      type: object
+      properties:
+        name:
+          type: string
+        slug:
+          type: string
+        platformType:
+          type: string
+        description:
+          type: string
+      required: [name, slug]
+
+    SearchResponse:
+      type: object
+      properties:
+        results:
+          type: array
+          items:
+            $ref: "#/components/schemas/Dork"
+        total:
+          type: integer
+        page:
+          type: integer
+        limit:
+          type: integer
+        totalPages:
+          type: integer
+        query:
+          type: string
+      required: [results, total, page, limit, totalPages, query]
+
+    Source:
+      type: object
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+        sourceType:
+          type: string
+        baseUrl:
+          type: string
+        fetchMethod:
+          type: string
+        isActive:
+          type: boolean
+        lastFetchedAt:
+          type: string
+        jobCount:
+          type: integer
+        createdAt:
+          type: string
+      required: [id, name, sourceType, isActive]
+
+    CreateSourceBody:
+      type: object
+      properties:
+        name:
+          type: string
+        sourceType:
+          type: string
+        baseUrl:
+          type: string
+        fetchMethod:
+          type: string
+        isActive:
+          type: boolean
+      required: [name, sourceType]
+
+    RunIngestionBody:
+      type: object
+      properties:
+        sourceId:
+          type: integer
+        jobType:
+          type: string
+      required: [sourceId]
+
+    IngestionJob:
+      type: object
+      properties:
+        id:
+          type: integer
+        sourceId:
+          type: integer
+        source:
+          $ref: "#/components/schemas/Source"
+        jobType:
+          type: string
+        status:
+          type: string
+        startedAt:
+          type: string
+        finishedAt:
+          type: string
+        itemsFound:
+          type: integer
+        itemsProcessed:
+          type: integer
+        errorMessage:
+          type: string
+        createdAt:
+          type: string
+      required: [id, sourceId, status]
+
+    IngestionJobListResponse:
+      type: object
+      properties:
+        jobs:
+          type: array
+          items:
+            $ref: "#/components/schemas/IngestionJob"
+        total:
+          type: integer
+        page:
+          type: integer
+        limit:
+          type: integer
+        totalPages:
+          type: integer
+      required: [jobs, total, page, limit, totalPages]
+
+    RawContent:
+      type: object
+      properties:
+        id:
+          type: integer
+        sourceId:
+          type: integer
+        title:
+          type: string
+        rawText:
+          type: string
+        sourceUrl:
+          type: string
+        contentHash:
+          type: string
+        discoveredAt:
+          type: string
+        extractedDorkCount:
+          type: integer
+      required: [id, sourceId, contentHash]
+
+    RawContentListResponse:
+      type: object
+      properties:
+        items:
+          type: array
+          items:
+            $ref: "#/components/schemas/RawContent"
+        total:
+          type: integer
+        page:
+          type: integer
+        limit:
+          type: integer
+        totalPages:
+          type: integer
+      required: [items, total, page, limit, totalPages]
+
+    ExtractBody:
+      type: object
+      properties:
+        rawContentId:
+          type: integer
+        rawText:
+          type: string
+      required: [rawText]
+
+    ExtractResult:
+      type: object
+      properties:
+        candidates:
+          type: array
+          items:
+            type: string
+        count:
+          type: integer
+      required: [candidates, count]
+
+    ExtractedDork:
+      type: object
+      properties:
+        id:
+          type: integer
+        rawContentId:
+          type: integer
+        rawQuery:
+          type: string
+        normalizedQuery:
+          type: string
+        optimizedQuery:
+          type: string
+        extractedTitle:
+          type: string
+        detectedCategory:
+          type: string
+        detectedIntent:
+          type: string
+        confidenceScore:
+          type: number
+        processingStatus:
+          type: string
+        createdAt:
+          type: string
+      required: [id, rawQuery, processingStatus]
+
+    ExtractedDorkListResponse:
+      type: object
+      properties:
+        items:
+          type: array
+          items:
+            $ref: "#/components/schemas/ExtractedDork"
+        total:
+          type: integer
+        page:
+          type: integer
+        limit:
+          type: integer
+        totalPages:
+          type: integer
+      required: [items, total, page, limit, totalPages]
+
+    AiCategorizeBody:
+      type: object
+      properties:
+        query:
+          type: string
+        context:
+          type: string
+      required: [query]
+
+    AiCategorizeResult:
+      type: object
+      properties:
+        primaryCategory:
+          type: string
+        subcategories:
+          type: array
+          items:
+            type: string
+        intentType:
+          type: string
+        difficulty:
+          type: string
+        tags:
+          type: array
+          items:
+            type: string
+        platforms:
+          type: array
+          items:
+            type: string
+        operators:
+          type: array
+          items:
+            type: string
+        title:
+          type: string
+        description:
+          type: string
+      required: [primaryCategory, intentType, difficulty]
+
+    AiOptimizeBody:
+      type: object
+      properties:
+        query:
+          type: string
+        category:
+          type: string
+      required: [query]
+
+    AiOptimizeResult:
+      type: object
+      properties:
+        queryTemplate:
+          type: string
+        optimizedQuery:
+          type: string
+        title:
+          type: string
+        description:
+          type: string
+        tags:
+          type: array
+          items:
+            type: string
+        relatedVariants:
+          type: array
+          items:
+            type: string
+      required: [queryTemplate, optimizedQuery, title]
+
+    Bookmark:
+      type: object
+      properties:
+        id:
+          type: integer
+        userId:
+          type: integer
+        dorkId:
+          type: integer
+        dork:
+          $ref: "#/components/schemas/Dork"
+        folderName:
+          type: string
+        createdAt:
+          type: string
+      required: [id, dorkId, createdAt]
+
+    CreateBookmarkBody:
+      type: object
+      properties:
+        dorkId:
+          type: integer
+        folderName:
+          type: string
+      required: [dorkId]
+
+    Collection:
+      type: object
+      properties:
+        id:
+          type: integer
+        userId:
+          type: integer
+        title:
+          type: string
+        description:
+          type: string
+        visibility:
+          type: string
+        itemCount:
+          type: integer
+        createdAt:
+          type: string
+        updatedAt:
+          type: string
+      required: [id, title, visibility, createdAt]
+
+    CollectionDetail:
+      allOf:
+        - $ref: "#/components/schemas/Collection"
+        - type: object
+          properties:
+            items:
+              type: array
+              items:
+                $ref: "#/components/schemas/CollectionItem"
+
+    CollectionItem:
+      type: object
+      properties:
+        collectionId:
+          type: integer
+        dorkId:
+          type: integer
+        dork:
+          $ref: "#/components/schemas/Dork"
+        displayOrder:
+          type: integer
+        notes:
+          type: string
+      required: [collectionId, dorkId]
+
+    CreateCollectionBody:
+      type: object
+      properties:
+        title:
+          type: string
+        description:
+          type: string
+        visibility:
+          type: string
+      required: [title]
+
+    AnalyticsData:
+      type: object
+      properties:
+        totalDorks:
+          type: integer
+        totalCategories:
+          type: integer
+        totalSources:
+          type: integer
+        totalRawContent:
+          type: integer
+        totalExtracted:
+          type: integer
+        pendingReview:
+          type: integer
+        recentIngestions:
+          type: array
+          items:
+            $ref: "#/components/schemas/IngestionJob"
+        categoryDistribution:
+          type: array
+          items:
+            $ref: "#/components/schemas/CategoryCount"
+        difficultyBreakdown:
+          type: array
+          items:
+            $ref: "#/components/schemas/DifficultyCount"
+        dailyActivity:
+          type: array
+          items:
+            $ref: "#/components/schemas/DailyActivity"
+      required: [totalDorks, totalCategories, totalSources]
+
+    SiteStats:
+      type: object
+      properties:
+        totalDorks:
+          type: integer
+        totalCategories:
+          type: integer
+        totalSources:
+          type: integer
+        recentDiscoveries:
+          type: integer
+        totalOperators:
+          type: integer
+        totalPlatforms:
+          type: integer
+      required: [totalDorks, totalCategories, totalSources, recentDiscoveries]
+
+    CategoryCount:
+      type: object
+      properties:
+        name:
+          type: string
+        slug:
+          type: string
+        count:
+          type: integer
+        color:
+          type: string
+      required: [name, count]
+
+    DifficultyCount:
+      type: object
+      properties:
+        difficulty:
+          type: string
+        count:
+          type: integer
+      required: [difficulty, count]
+
+    DailyActivity:
+      type: object
+      properties:
+        date:
+          type: string
+        dorksAdded:
+          type: integer
+        rawContentFetched:
+          type: integer
+      required: [date, dorksAdded]

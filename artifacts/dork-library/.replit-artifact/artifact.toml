@@ -1,0 +1,31 @@
+kind = "web"
+previewPath = "/"
+title = "Cybersecurity Dork Library"
+version = "1.0.0"
+id = "artifacts/dork-library"
+router = "path"
+
+[[integratedSkills]]
+name = "react-vite"
+version = "1.0.0"
+
+[[services]]
+name = "web"
+paths = [ "/" ]
+localPort = 19513
+
+[services.development]
+run = "pnpm --filter @workspace/dork-library run dev"
+
+[services.production]
+build = [ "pnpm", "--filter", "@workspace/dork-library", "run", "build" ]
+publicDir = "artifacts/dork-library/dist/public"
+serve = "static"
+
+[[services.production.rewrites]]
+from = "/*"
+to = "/index.html"
+
+[services.env]
+PORT = "19513"
+BASE_PATH = "/"
