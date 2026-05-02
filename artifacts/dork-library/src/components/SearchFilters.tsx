@@ -32,9 +32,13 @@ const SORT_OPTIONS = [
 ];
 
 export function SearchFilters({ filters, onChange }: Props) {
-  const { data: cats } = useListCategories();
-  const { data: tags } = useListTags();
-  const { data: platforms } = useListPlatforms();
+  const { data: catsRaw } = useListCategories();
+  const { data: tagsRaw } = useListTags();
+  const { data: platformsRaw } = useListPlatforms();
+
+  const cats = Array.isArray(catsRaw) ? catsRaw : [];
+  const tags = Array.isArray(tagsRaw) ? tagsRaw : [];
+  const platforms = Array.isArray(platformsRaw) ? platformsRaw : [];
 
   const hasFilters = Object.entries(filters).some(([k, v]) => k !== "sortBy" && !!v);
 

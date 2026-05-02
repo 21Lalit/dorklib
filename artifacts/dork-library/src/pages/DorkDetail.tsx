@@ -3,6 +3,7 @@ import { motion } from "framer-motion";
 import { ArrowLeft, Eye, Copy, Clock, Tag, Cpu, Monitor, History, Share2 } from "lucide-react";
 import { useGetDork } from "@workspace/api-client-react";
 import { QueryBox } from "@/components/QueryBox";
+import { QueryBuilder } from "@/components/QueryBuilder";
 import { DifficultyBadge } from "@/components/DifficultyBadge";
 import { TagBadge } from "@/components/TagBadge";
 import { OperatorBadge } from "@/components/OperatorBadge";
@@ -88,6 +89,12 @@ export default function DorkDetail() {
           <QueryBox query={data.optimizedQuery} showCopy={false} />
         </div>
       )}
+
+      <QueryBuilder
+        queryTemplate={data.queryTemplate}
+        optimizedQuery={data.optimizedQuery}
+        dorkId={data.id}
+      />
 
       <div className="grid md:grid-cols-2 gap-6">
         {data.description && (
