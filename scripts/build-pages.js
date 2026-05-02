@@ -1,55 +1,19 @@
 #!/usr/bin/env node
 /**
- * Fetches all dorks from the live Replit API and rebuilds index.html.
- * Used by GitHub Actions to auto-update GitHub Pages every 6 hours.
- *
- * Required env var: REPLIT_API_URL — base URL of the deployed Replit app
- *   e.g. https://your-app.replit.app
+ * Reads data/dorks.json and rebuilds index.html for GitHub Pages.
+ * No external API calls needed — fully self-contained.
  */
-const https = require('https');
-const http  = require('http');
-const fs    = require('fs');
-const { parse } = require('url');
+const fs = require('fs');
+const path = require('path');
 
-const API_BASE = (process.env.REPLIT_API_URL || '').replace(/\/$/, '');
-if (!API_BASE) {
-  console.error('[build-pages] REPLIT_API_URL is not set. Add it as a GitHub Actions secret.');
+const dataFile = path.join(__dirname, '..', 'data', 'dorks.json');
+if (!fs.existsSync(dataFile)) {
+  console.error('[build-pages] data/dorks.json not found. Run fetch scripts first.');
   process.exit(1);
 }
 
-function fetchPage(page) {
-  const u = parse(API_BASE + '/api/dorks?limit=500&page=' + page);
-  const lib = u.protocol === 'https:' ? https : http;
-  return new Promise((resolve, reject) => {
-    lib.get(
-      { hostname: u.hostname, path: u.path, headers: { 'User-Agent': 'github-actions-dorklib' } },
-      res => {
-        let d = '';
-        res.on('data', c => d += c);
-        res.on('end', () => {
-          try { resolve(JSON.parse(d)); }
-          catch (e) { reject(new Error('Bad JSON page ' + page + ': ' + d.slice(0, 120))); }
-        });
-      }
-    ).on('error', reject);
-  });
-}
-
-const ROOT_SLUG_MAP = {
-  'web-security':'Web Security','cloud-security':'Cloud Security','ai-security':'AI Security',
-  'osint':'OSINT','blue-team':'Blue Team','devsecops':'DevSecOps',
-  'identity-access':'Identity and Access','vulnerability-research':'Vulnerability Research',
-  'compliance-audit':'Compliance and Audit','digital-forensics':'Digital Forensics & IR',
-  'threat-intelligence':'Threat Intelligence','learning-labs':'Learning and Labs',
-  'network-security':'Network Security','mobile-security':'Mobile Security',
-  'iot-ot-security':'IoT and OT Security','misc-dorks':'Miscellaneous Dorks','red-team':'Red Team',
-};
-function getRootCat(dk) {
-  if (!dk.primaryCategory) return 'Miscellaneous Dorks';
-  const k = (dk.primaryCategory.slug || '').split('--')[0];
-  return ROOT_SLUG_MAP[k] || 'Miscellaneous Dorks';
-}
-const HIGH = new Set(['CREDENTIAL_HARVESTING','DATA_EXPOSURE','ADMIN_ACCESS','VULNERABILITY_DISCOVERY']);
+const { dorks: raw, updatedAt } = JSON.parse(fs.readFileSync(dataFile, 'utf8'));
+console.log('[build-pages] Loaded', raw.length, 'dorks from data/dorks.json');
 
 const CAT_ICONS = {
   'All':'✦','Web Security':'🌐','Cloud Security':'☁️','Network Security':'🔌','DevSecOps':'⚙️',
@@ -58,7 +22,6 @@ const CAT_ICONS = {
   'IoT and OT Security':'🔧','Digital Forensics & IR':'🔎','Threat Intelligence':'🎯',
   'Mobile Security':'📱','Learning and Labs':'📚','Miscellaneous Dorks':'🗂️',
 };
-
 const DIFF_CFG = {
   BEGINNER:    { label:'Beginner',     color:'#2a6a3c', bg:'rgba(42,106,60,0.10)',  border:'rgba(42,106,60,0.22)'  },
   INTERMEDIATE:{ label:'Intermediate', color:'#7a520c', bg:'rgba(122,82,12,0.10)',  border:'rgba(122,82,12,0.22)'  },
@@ -66,41 +29,24 @@ const DIFF_CFG = {
   EXPERT:      { label:'Expert',       color:'#5a2a8a', bg:'rgba(90,42,138,0.10)',  border:'rgba(90,42,138,0.22)'  },
 };
 
-async function main() {
-  console.log('[build-pages] Fetching from', API_BASE);
-  const first = await fetchPage(1);
-  if (!first.dorks) throw new Error('Unexpected API response: ' + JSON.stringify(first).slice(0, 200));
-  const total = first.total;
-  const pages = Math.ceil(total / 500);
-  const raw = [...first.dorks];
-  for (let p = 2; p <= pages; p++) {
-    const r = await fetchPage(p);
-    raw.push(...r.dorks);
-    process.stdout.write('\r[build-pages] Fetched ' + raw.length + '/' + total);
-  }
-  console.log('\n[build-pages] Total:', raw.length, 'dorks');
+const dorks = raw.map(dk => ({
+  id: dk.id, title: dk.title || 'Untitled',
+  query: dk.query || '', diff: dk.difficulty || 'BEGINNER',
+  cat: dk.category || 'Miscellaneous Dorks',
+  desc: (dk.description || '').slice(0, 180),
+  featured: dk.featured || false,
+}));
 
-  const dorks = raw.map(dk => ({
-    id: dk.id,
-    title: dk.title || 'Untitled',
-    query: dk.queryTemplate || dk.optimizedQuery || '',
-    diff: dk.difficulty || 'BEGINNER',
-    cat: getRootCat(dk),
-    desc: (dk.description || dk.usageContext || '').slice(0, 180),
-    featured: dk.difficulty === 'ADVANCED' && HIGH.has(dk.intentType),
-  }));
+const cats = ['All', ...[...new Set(dorks.map(x => x.cat))].sort()];
+const TOTAL = dorks.length.toLocaleString();
+const CATCOUNT = cats.length - 1;
+const DATE = (updatedAt || new Date().toISOString()).slice(0, 10);
+const DJ  = JSON.stringify(dorks).replace(/</g,'\\u003c').replace(/>/g,'\\u003e').replace(/&/g,'\\u0026');
+const CJ  = JSON.stringify(cats);
+const IJ  = JSON.stringify(CAT_ICONS);
+const DFJ = JSON.stringify(DIFF_CFG);
 
-  const cats = ['All', ...[...new Set(dorks.map(x => x.cat))].sort()];
-  const TOTAL = dorks.length.toLocaleString();
-  const CATCOUNT = cats.length - 1;
-  const DATE = new Date().toISOString().slice(0, 10);
-
-  const DJ  = JSON.stringify(dorks).replace(/</g,'\\u003c').replace(/>/g,'\\u003e').replace(/&/g,'\\u0026');
-  const CJ  = JSON.stringify(cats);
-  const IJ  = JSON.stringify(CAT_ICONS);
-  const DFJ = JSON.stringify(DIFF_CFG);
-
-  const html = `<!DOCTYPE html>
+const html = `<!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8"/>
@@ -259,8 +205,5 @@ renderPills();renderAll();
 </body>
 </html>`;
 
-  fs.writeFileSync('index.html', html);
-  console.log('[build-pages] Wrote index.html —', raw.length, 'dorks,', (Buffer.byteLength(html) / 1024).toFixed(0) + 'KB, dated', DATE);
-}
-
-main().catch(e => { console.error('[build-pages] Fatal:', e.message); process.exit(1); });
+fs.writeFileSync(path.join(__dirname, '..', 'index.html'), html);
+console.log('[build-pages] Done —', raw.length, 'dorks,' , (Buffer.byteLength(html)/1024).toFixed(0)+'KB, dated', DATE);
