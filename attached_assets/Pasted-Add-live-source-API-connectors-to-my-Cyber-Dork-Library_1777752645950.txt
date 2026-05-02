@@ -1,0 +1,156 @@
+Add live source API connectors to my Cyber Dork Library project.
+
+Important safety rules:
+- Do not store real domains, real companies, real emails, real API keys, real tokens, real passwords, leaked secrets, or exploit instructions.
+- Any query pattern imported from live sources must be normalized into safe placeholders such as {domain}, {company}, {keyword}, {technology}, {filetype}, {cloud_provider}, {platform}, {date}.
+- All live results must go first into RawContent and ExtractedDork review queue.
+- Do not auto-publish imported dorks unless an admin reviews/imports them.
+
+Add these environment variables to .env.example:
+
+GOOGLE_CSE_API_KEY=
+GOOGLE_CSE_ID=
+GITHUB_TOKEN=
+RSS_FEEDS=
+MEDIUM_FEEDS=
+AI_API_KEY=
+AI_MODEL=
+AI_BASE_URL=
+
+Create these files:
+
+1. src/lib/live-sources/google-cse.ts
+- Use Google Custom Search JSON API.
+- Function: searchGoogleDorkPatterns(query: string)
+- Call:
+  https://www.googleapis.com/customsearch/v1?key=${GOOGLE_CSE_API_KEY}&cx=${GOOGLE_CSE_ID}&q=${encodeURIComponent(query)}
+- Return title, snippet, link, sourceType: "GOOGLE_CSE".
+- Store only metadata/snippet in RawContent.
+- Never store dangerous real target queries directly.
+- Run sanitizer before storing.
+
+2. src/lib/live-sources/github.ts
+- Use GitHub REST API.
+- Function: searchGitHubDorkPatterns(query: string)
+- Search public repositories and code/markdown files for educational dork pattern content.
+- Use Authorization: Bearer ${GITHUB_TOKEN}.
+- Suggested safe search terms:
+  "google dork examples cybersecurity"
+  "google dork cheatsheet filetype md"
+  "osint dork examples"
+  "security dork cheat sheet"
+  "defensive google dork monitoring"
+- Fetch README/markdown content only when rate limits allow.
+- Store source URL, title, and safe excerpt in RawContent.
+- Sanitize before storing.
+
+3. src/lib/live-sources/rss.ts
+- Use rss-parser package.
+- Function: fetchRssFeeds()
+- Read RSS_FEEDS and MEDIUM_FEEDS from env as comma-separated URLs.
+- Fetch title, link, contentSnippet/content.
+- Store as RawContent.
+- Sanitize before storing.
+
+4. src/lib/safety/sanitize-dork.ts
+Create:
+- sanitizeDorkText(input: string): string
+- normalizeDorkQuery(input: string): string
+- containsDangerousSecret(input: string): boolean
+
+Sanitizer rules:
+- Replace domains with {domain}.
+- Replace company-like names with {company} when used as targets.
+- Replace emails with {email}.
+- Replace IP addresses with {ip_address}.
+- Replace API keys, tokens, bearer tokens, private keys, password-like strings with {secret_placeholder}.
+- Replace filenames that look sensitive with {filetype} or {keyword}.
+- Keep only educational query templates.
+- Remove or reject content that contains real leaked secrets, credential dumps, exploit steps, or instructions to abuse systems.
+
+5. src/lib/ingestion/live-ingestion.ts
+Create:
+- runGoogleCseIngestion()
+- runGitHubIngestion()
+- runRssIngestion()
+- runAllLiveIngestionSources()
+
+Each function should:
+- create IngestionJob
+- fetch from source
+- contentHash deduplicate
+- save RawContent
+- run extractDorkCandidates(rawText)
+- save ExtractedDork with processingStatus NEW
+- update job status and counts
+
+6. src/app/api/ingestion/live/google/route.ts
+POST route:
+- admin protected
+- calls runGoogleCseIngestion()
+
+7. src/app/api/ingestion/live/github/route.ts
+POST route:
+- admin protected
+- calls runGitHubIngestion()
+
+8. src/app/api/ingestion/live/rss/route.ts
+POST route:
+- admin protected
+- calls runRssIngestion()
+
+9. src/app/api/ingestion/live/run-all/route.ts
+POST route:
+- admin protected
+- calls runAllLiveIngestionSources()
+
+10. Update /admin/sources page
+Add source cards:
+- Google Programmable Search
+- GitHub Search
+- RSS / Medium Feeds
+Each card should have:
+- status
+- last run time
+- run now button
+- items found
+- items processed
+- errors
+
+11. Update /admin/ingestion page
+Add tabs:
+- Jobs
+- Raw content
+- Extracted candidates
+- Import review
+
+12. Update prisma seed
+Add default Source rows:
+- Google Programmable Search
+- GitHub Public Search
+- Medium RSS
+- Security Blog RSS
+- Manual Submission
+
+13. Add rate limiting / queue behavior
+- Do not run live ingestion on every page load.
+- Use IngestionJob table as a mock queue.
+- Prevent duplicate RUNNING jobs for the same source.
+- Add cooldown settings:
+  Google CSE: manual/admin only or max once per hour
+  GitHub: max once per hour
+  RSS: max once every 30 minutes
+
+14. Add admin warning banner:
+"Live sources may contain unsafe or real-world content. This app sanitizes and sends all extracted patterns to review before publishing."
+
+15. Add npm dependencies:
+npm install rss-parser crypto-js
+
+16. Add README section:
+"Live Source Setup"
+Explain:
+- GOOGLE_CSE_API_KEY and GOOGLE_CSE_ID are needed for Google Programmable Search JSON API.
+- GITHUB_TOKEN is optional but recommended for higher API limits.
+- RSS_FEEDS and MEDIUM_FEEDS accept comma-separated feed URLs.
+- Live data is sanitized and queued for admin review before import.
