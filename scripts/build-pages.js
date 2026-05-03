@@ -112,6 +112,8 @@ const html = `<!DOCTYPE html>
 <link rel="preconnect" href="https://fonts.googleapis.com"/>
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,900;1,400;1,700&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/animate.css@4/animate.min.css"/>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/balloon-css@1/balloon.min.css"/>
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
 html{scroll-behavior:smooth;-webkit-font-smoothing:antialiased}
@@ -284,7 +286,81 @@ footer{border-top:1px solid var(--border);padding:28px 24px;display:flex;align-i
 .foot-badge{font-size:10px;color:var(--muted-fg);padding:3px 10px;border:1px solid var(--border);border-radius:20px}
 
 /* PAGES */
-.page{display:none}.page.active{display:block}
+.page{display:none}.page.active{display:block;animation:pageFadeIn 0.22s ease both}
+@keyframes pageFadeIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+
+/* SCROLLBAR */
+::-webkit-scrollbar{width:6px;height:6px}
+::-webkit-scrollbar-track{background:var(--bg)}
+::-webkit-scrollbar-thumb{background:var(--border);border-radius:3px}
+::-webkit-scrollbar-thumb:hover{background:var(--muted-fg)}
+
+/* SELECTION */
+::selection{background:rgba(26,20,16,0.13);color:var(--fg)}
+
+/* FOCUS VISIBLE */
+:focus-visible{outline:2px solid rgba(26,20,16,0.3);outline-offset:2px;border-radius:var(--radius)}
+input:focus-visible{outline:none}
+
+/* NAV ACTIVE UNDERLINE INDICATOR */
+.nav-link{position:relative}
+.nav-link.active::after{content:'';position:absolute;bottom:-14px;left:12px;right:12px;height:2px;background:var(--fg);border-radius:1px}
+
+/* CARD STAGGER ANIMATION */
+@keyframes cardIn{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
+.dorks-grid > *{animation:cardIn 0.28s ease both}
+.dorks-grid > *:nth-child(1){animation-delay:0.03s}
+.dorks-grid > *:nth-child(2){animation-delay:0.07s}
+.dorks-grid > *:nth-child(3){animation-delay:0.11s}
+.dorks-grid > *:nth-child(4){animation-delay:0.15s}
+.dorks-grid > *:nth-child(5){animation-delay:0.19s}
+.dorks-grid > *:nth-child(6){animation-delay:0.22s}
+.dorks-grid > *:nth-child(n+7){animation-delay:0.25s}
+.cat-grid > *,.cat-grid-full > *{animation:cardIn 0.28s ease both}
+.cat-grid > *:nth-child(1),.cat-grid-full > *:nth-child(1){animation-delay:0.03s}
+.cat-grid > *:nth-child(2),.cat-grid-full > *:nth-child(2){animation-delay:0.07s}
+.cat-grid > *:nth-child(3),.cat-grid-full > *:nth-child(3){animation-delay:0.11s}
+.cat-grid > *:nth-child(4),.cat-grid-full > *:nth-child(4){animation-delay:0.15s}
+.cat-grid > *:nth-child(n+5),.cat-grid-full > *:nth-child(n+5){animation-delay:0.19s}
+.stats-grid > *{animation:cardIn 0.28s ease both}
+.stats-grid > *:nth-child(1){animation-delay:0.06s}
+.stats-grid > *:nth-child(2){animation-delay:0.12s}
+.stats-grid > *:nth-child(3){animation-delay:0.18s}
+.stats-grid > *:nth-child(4){animation-delay:0.24s}
+
+/* CHIP HOVER AMBER TINT */
+.chip:hover{background:rgba(210,160,60,0.1);border-color:rgba(160,110,40,0.35);color:#4a3420}
+
+/* DORK CARD OPEN GLOW */
+.dork-card.open{border-color:rgba(26,20,16,0.22);box-shadow:0 4px 20px rgba(0,0,0,0.10)}
+
+/* SECTION HEADER ANIMATION */
+.section-title{display:flex;align-items:center;gap:8px}
+
+/* COPY BUTTON FEEDBACK */
+.copy-btn.copied{background:var(--fg);color:var(--bg);border-color:var(--fg)}
+
+/* STAT CARD HOVER LIFT */
+.stat-card:hover{box-shadow:0 6px 20px rgba(0,0,0,0.10);transform:translateY(-2px)}
+
+/* CAT CARD HOVER LIFT */
+.cat-card:hover{box-shadow:0 6px 20px rgba(0,0,0,0.10);transform:translateY(-2px)}
+
+/* DORK CARD HOVER LIFT */
+.dork-card:not(.open):hover{box-shadow:0 4px 14px rgba(0,0,0,0.09);transform:translateY(-1px)}
+
+/* HERO ANIMATE */
+.hero-inner>*{animation:cardIn 0.3s ease both}
+.eyebrow{animation-delay:0.05s}
+.hero-title{animation-delay:0.1s}
+.hero-sub{animation-delay:0.13s}
+.double-rule{animation-delay:0.16s}
+.hero-search-form{animation-delay:0.19s}
+.chips{animation-delay:0.22s}
+
+/* BALLOON TOOLTIP OVERRIDES — match cream theme */
+[data-balloon-pos]:after{font-family:var(--sans);font-size:11px;background:var(--fg);color:var(--bg);border-radius:var(--radius);padding:4px 8px;letter-spacing:0.01em}
+[data-balloon-pos]:before{border-top-color:var(--fg)}
 
 /* RESPONSIVE */
 @media(max-width:900px){
@@ -598,7 +674,7 @@ function esc(s){
 }
 function diffBadge(d){
   const c = DIFF_CFG[d] || DIFF_CFG.BEGINNER;
-  return '<span class="badge ' + c.cls + '">' + c.label + '</span>';
+  return '<span class="badge ' + c.cls + '" data-balloon="Difficulty: ' + c.label + '" data-balloon-pos="up">' + c.label + '</span>';
 }
 function timeAgo(iso){
   if(!iso) return '';
@@ -617,8 +693,8 @@ function copyText(text, btn){
     t.value = text; document.body.appendChild(t); t.select();
     document.execCommand('copy'); document.body.removeChild(t);
   });
-  btn.textContent = '✓ Copied'; btn.classList.add('ok');
-  setTimeout(function(){ btn.textContent = 'Copy'; btn.classList.remove('ok'); }, 1500);
+  btn.textContent = '✓ Copied'; btn.classList.add('ok','copied');
+  setTimeout(function(){ btn.textContent = 'Copy'; btn.classList.remove('ok','copied'); }, 1500);
 }
 
 // ── NAVIGATION ──
@@ -652,7 +728,7 @@ function dorkCardHTML(d){
   if(isOpen){
     html += '<div class="query-expand" data-action="stop-propagation">';
     html += '<div class="query-box">' + esc(d.query) + '</div>';
-    html += '<button class="copy-btn" data-action="copy" data-id="' + d.id + '">Copy</button>';
+    html += '<button class="copy-btn" data-action="copy" data-id="' + d.id + '" data-balloon="Copy to clipboard" data-balloon-pos="up">Copy</button>';
     html += '</div>';
   }
   html += '<div class="dork-footer">';
