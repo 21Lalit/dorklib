@@ -2,7 +2,7 @@
 
 > A curated, auto-updating collection of Google-style search dork patterns for cybersecurity professionals, penetration testers, and OSINT researchers.
 
-**Live site →** [https://21lalit.github.io/Replit-new-repo/](https://21lalit.github.io/Replit-new-repo/)
+**Live site →** [https://21lalit.github.io/dorklib/](https://21lalit.github.io/dorklib/)
 
 ---
 
@@ -83,8 +83,8 @@ No build tools or dependencies required — just Node.js.
 
 ```bash
 # Clone the repo
-git clone https://github.com/21Lalit/Replit-new-repo.git
-cd Replit-new-repo
+git clone https://github.com/21Lalit/dorklib.git
+cd dorklib
 
 # Fetch latest dorks (optional — data/dorks.json already included)
 GITHUB_TOKEN=your_token node scripts/fetch-github-dorks.js
