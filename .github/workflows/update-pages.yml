@@ -30,6 +30,12 @@ jobs:
       - name: Fetch new dorks from security RSS feeds
         run: node scripts/fetch-rss-dorks.js
 
+      - name: Fetch new dorks via Google CSE
+        env:
+          GOOGLE_CSE_API_KEY: ${{ secrets.GOOGLE_CSE_API_KEY }}
+          GOOGLE_CSE_ID: ${{ secrets.GOOGLE_CSE_ID }}
+        run: node scripts/fetch-google-cse-dorks.js
+
       - name: Rebuild index.html from data/dorks.json
         run: node scripts/build-pages.js
 
