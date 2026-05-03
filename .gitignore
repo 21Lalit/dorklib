@@ -1,4 +1,4 @@
-# See https://docs.github.com/en/get-started/getting-started-with-git/ignoring-files for more about ignoring files.
+# See https://docs.github.com/en/get-started/getting-started-with-git/ignoring-files
 
 # compiled output
 dist
@@ -41,9 +41,11 @@ testem.log
 .DS_Store
 Thumbs.db
 
-.cursor/rules/nx-rules.mdc
-.github/instructions/nx.instructions.md
-
-# Replit
+# Platform / local tooling (not needed in repo)
 .cache/
 .local/
+.replit
+.replit-artifact/
+.replitignore
+attached_assets/
+screenshots/
