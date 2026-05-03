@@ -316,6 +316,8 @@ footer{border-top:1px solid var(--border);padding:28px 24px;display:flex;align-i
       <button class="nav-link active" data-action="nav" data-page="home" id="nav-home">Home</button>
       <button class="nav-link" data-action="nav" data-page="dorks" id="nav-dorks">Dorks</button>
       <button class="nav-link" data-action="nav" data-page="categories" id="nav-categories">Categories</button>
+      <button class="nav-link" data-action="nav" data-page="trending" id="nav-trending">Trending</button>
+      <button class="nav-link" data-action="nav" data-page="recent" id="nav-recent">Recent</button>
     </div>
     <div class="nav-search-wrap">
       <svg class="nav-search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
@@ -393,7 +395,7 @@ footer{border-top:1px solid var(--border);padding:28px 24px;display:flex;align-i
           <svg class="section-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg>
           Trending Dorks
         </h2>
-        <button class="section-link" data-action="nav" data-page="dorks">View all →</button>
+        <button class="section-link" data-action="nav" data-page="trending">View all →</button>
       </div>
       <div class="dorks-grid" id="home-trending"></div>
     </div>
@@ -406,7 +408,7 @@ footer{border-top:1px solid var(--border);padding:28px 24px;display:flex;align-i
           <svg class="section-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
           Recently Added
         </h2>
-        <button class="section-link" data-action="nav" data-page="dorks">View all →</button>
+        <button class="section-link" data-action="nav" data-page="recent">View all →</button>
       </div>
       <div class="dorks-grid" id="home-recent"></div>
     </div>
@@ -473,6 +475,68 @@ footer{border-top:1px solid var(--border);padding:28px 24px;display:flex;align-i
       <p>${CAT_COUNT} security categories · ${TOTAL.toLocaleString()} total patterns</p>
     </div>
     <div class="cat-grid-full" id="cats-full-grid"></div>
+    <div style="height:32px"></div>
+  </div>
+</div>
+
+<!-- TRENDING PAGE -->
+<div id="page-trending" class="page">
+  <div class="container dorks-page">
+    <div class="dorks-header">
+      <div class="dorks-header-left">
+        <h2>Trending Dorks</h2>
+        <p id="trending-count-label">Advanced &amp; Expert patterns</p>
+      </div>
+      <div class="view-btns">
+        <button class="view-btn active" id="tbtn-grid" data-action="tview" data-view="grid" title="Grid view">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>
+        </button>
+        <button class="view-btn" id="tbtn-list" data-action="tview" data-view="list" title="List view">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg>
+        </button>
+      </div>
+    </div>
+    <div class="dorks-search-wrap" style="max-width:600px;margin-bottom:20px">
+      <svg class="dorks-search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+      <input class="dorks-search" id="trending-search-input" type="search" placeholder="Filter trending patterns…" autocomplete="off"/>
+    </div>
+    <div class="dorks-grid" id="trending-grid"></div>
+    <div class="empty-state" id="trending-empty" style="display:none">
+      <svg class="empty-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+      <p>No results</p><p class="sub">Try a different search</p>
+    </div>
+    <div class="pagination" id="trending-pagination"></div>
+    <div style="height:32px"></div>
+  </div>
+</div>
+
+<!-- RECENT PAGE -->
+<div id="page-recent" class="page">
+  <div class="container dorks-page">
+    <div class="dorks-header">
+      <div class="dorks-header-left">
+        <h2>Recently Added</h2>
+        <p id="recent-page-label">Newest patterns</p>
+      </div>
+      <div class="view-btns">
+        <button class="view-btn active" id="rbtn-grid" data-action="rview" data-view="grid" title="Grid view">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>
+        </button>
+        <button class="view-btn" id="rbtn-list" data-action="rview" data-view="list" title="List view">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg>
+        </button>
+      </div>
+    </div>
+    <div class="dorks-search-wrap" style="max-width:600px;margin-bottom:20px">
+      <svg class="dorks-search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+      <input class="dorks-search" id="recent-search-input" type="search" placeholder="Filter recent patterns…" autocomplete="off"/>
+    </div>
+    <div class="dorks-grid" id="recent-grid"></div>
+    <div class="empty-state" id="recent-empty" style="display:none">
+      <svg class="empty-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+      <p>No results</p><p class="sub">Try a different search</p>
+    </div>
+    <div class="pagination" id="recent-pagination"></div>
     <div style="height:32px"></div>
   </div>
 </div>
@@ -568,6 +632,8 @@ function showPage(name){
   window.scrollTo({ top: 0, behavior: 'smooth' });
   if(name === 'dorks')      renderDorksPage();
   if(name === 'categories') renderCatsPage();
+  if(name === 'trending')   renderTrendingPage();
+  if(name === 'recent')     renderRecentPage();
 }
 
 // ── DORK CARD ──
@@ -690,6 +756,111 @@ function renderCatsPage(){
   document.getElementById('cats-full-grid').innerHTML = CATS.map(catCardHTML).join('');
 }
 
+// ── GENERIC PAGED LIST RENDERER ──
+function renderPagedList(cfg){
+  // cfg: { items, page, view, gridId, emptyId, paginationId, labelId, labelText, pageAction, viewAction, gridBtn, listBtn, openId }
+  var q = (cfg.q || '').toLowerCase().trim();
+  var filtered = cfg.items.filter(function(d){
+    if(!q) return true;
+    return d.title.toLowerCase().includes(q) || d.query.toLowerCase().includes(q) || d.cat.toLowerCase().includes(q);
+  });
+  var total      = filtered.length;
+  var totalPages = Math.max(1, Math.ceil(total / PAGE_SIZE));
+  if(cfg.page[0] > totalPages) cfg.page[0] = totalPages;
+  if(cfg.labelId) document.getElementById(cfg.labelId).textContent = total.toLocaleString() + ' ' + (cfg.labelText || 'patterns');
+
+  var start     = (cfg.page[0] - 1) * PAGE_SIZE;
+  var pageItems = filtered.slice(start, start + PAGE_SIZE);
+  var grid  = document.getElementById(cfg.gridId);
+  var empty = document.getElementById(cfg.emptyId);
+
+  if(pageItems.length === 0){
+    grid.innerHTML = ''; empty.style.display = 'block';
+  } else {
+    empty.style.display = 'none';
+    grid.className = 'dorks-grid' + (cfg.view[0] === 'list' ? ' list-view' : '');
+    // temporarily use openDorkId from outer scope for expansion
+    grid.innerHTML = pageItems.map(dorkCardHTML).join('');
+  }
+
+  // Pagination
+  var pgHTML = '';
+  if(totalPages > 1){
+    pgHTML += '<button class="pg-btn" data-action="' + cfg.pageAction + '" data-page="' + (cfg.page[0]-1) + '"' +
+              (cfg.page[0]===1 ? ' disabled' : '') + '>← Prev</button>';
+    var sp = [];
+    if(totalPages <= 7){
+      for(var i=1;i<=totalPages;i++) sp.push(i);
+    } else {
+      sp.push(1);
+      if(cfg.page[0]>3) sp.push('…');
+      for(var i=Math.max(2,cfg.page[0]-1);i<=Math.min(totalPages-1,cfg.page[0]+1);i++) sp.push(i);
+      if(cfg.page[0]<totalPages-2) sp.push('…');
+      sp.push(totalPages);
+    }
+    sp.forEach(function(p){
+      if(p==='…') pgHTML+='<span class="pg-dots">…</span>';
+      else pgHTML+='<button class="pg-btn'+(p===cfg.page[0]?' active':'')+'" data-action="'+cfg.pageAction+'" data-page="'+p+'">'+p+'</button>';
+    });
+    pgHTML += '<button class="pg-btn" data-action="' + cfg.pageAction + '" data-page="' + (cfg.page[0]+1) + '"' +
+              (cfg.page[0]===totalPages ? ' disabled' : '') + '>Next →</button>';
+    pgHTML += '<span class="pg-info">' + cfg.page[0] + ' / ' + totalPages + '</span>';
+  }
+  document.getElementById(cfg.paginationId).innerHTML = pgHTML;
+}
+
+// ── TRENDING STATE ──
+var trendingItems  = null; // lazy-built
+var trendingPage   = [1];
+var trendingView   = ['grid'];
+var trendingQ      = '';
+
+function getTrendingItems(){
+  if(!trendingItems){
+    // Advanced + Expert dorks, sorted by addedAt desc
+    trendingItems = DORKS.filter(function(d){ return d.diff==='ADVANCED'||d.diff==='EXPERT'; })
+      .slice().sort(function(a,b){ return (b.addedAt||'') < (a.addedAt||'') ? -1 : 1; });
+  }
+  return trendingItems;
+}
+
+function renderTrendingPage(){
+  renderPagedList({
+    items: getTrendingItems(), page: trendingPage, view: trendingView, q: trendingQ,
+    gridId: 'trending-grid', emptyId: 'trending-empty', paginationId: 'trending-pagination',
+    labelId: 'trending-count-label', labelText: 'advanced & expert patterns',
+    pageAction: 'tpage', viewAction: 'tview'
+  });
+}
+
+// ── RECENT STATE ──
+var recentItems = null; // lazy-built
+var recentPage  = [1];
+var recentView  = ['grid'];
+var recentQ     = '';
+
+function getRecentItems(){
+  if(!recentItems){
+    // Sorted by addedAt descending
+    recentItems = DORKS.slice().sort(function(a,b){
+      if(!a.addedAt && !b.addedAt) return 0;
+      if(!a.addedAt) return 1;
+      if(!b.addedAt) return -1;
+      return a.addedAt < b.addedAt ? 1 : -1;
+    });
+  }
+  return recentItems;
+}
+
+function renderRecentPage(){
+  renderPagedList({
+    items: getRecentItems(), page: recentPage, view: recentView, q: recentQ,
+    gridId: 'recent-grid', emptyId: 'recent-empty', paginationId: 'recent-pagination',
+    labelId: 'recent-page-label', labelText: 'patterns (newest first)',
+    pageAction: 'rpage', viewAction: 'rview'
+  });
+}
+
 // ── GLOBAL EVENT DELEGATION ──
 document.addEventListener('click', function(e){
   var el = e.target;
@@ -789,6 +960,40 @@ document.addEventListener('click', function(e){
     if(dp) dp.scrollIntoView({ behavior: 'smooth', block: 'start' });
     return;
   }
+
+  if(action === 'tview'){
+    trendingView[0] = el.dataset.view;
+    document.getElementById('tbtn-grid').classList.toggle('active', trendingView[0]==='grid');
+    document.getElementById('tbtn-list').classList.toggle('active', trendingView[0]==='list');
+    renderTrendingPage(); return;
+  }
+
+  if(action === 'tpage'){
+    if(el.disabled) return;
+    trendingPage[0] = parseInt(el.dataset.page, 10);
+    openDorkId = null;
+    renderTrendingPage();
+    var tp = document.getElementById('page-trending');
+    if(tp) tp.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    return;
+  }
+
+  if(action === 'rview'){
+    recentView[0] = el.dataset.view;
+    document.getElementById('rbtn-grid').classList.toggle('active', recentView[0]==='grid');
+    document.getElementById('rbtn-list').classList.toggle('active', recentView[0]==='list');
+    renderRecentPage(); return;
+  }
+
+  if(action === 'rpage'){
+    if(el.disabled) return;
+    recentPage[0] = parseInt(el.dataset.page, 10);
+    openDorkId = null;
+    renderRecentPage();
+    var rp = document.getElementById('page-recent');
+    if(rp) rp.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    return;
+  }
 });
 
 // Nav search
@@ -815,6 +1020,18 @@ document.getElementById('hero-search-input').addEventListener('keydown', functio
 document.getElementById('dorks-search-input').addEventListener('input', function(){
   dorksQ = this.value; dorksPage = 1; openDorkId = null;
   renderDorksPage();
+});
+
+// Trending search input
+document.getElementById('trending-search-input').addEventListener('input', function(){
+  trendingQ = this.value; trendingPage[0] = 1; openDorkId = null;
+  renderTrendingPage();
+});
+
+// Recent search input
+document.getElementById('recent-search-input').addEventListener('input', function(){
+  recentQ = this.value; recentPage[0] = 1; openDorkId = null;
+  renderRecentPage();
 });
 
 // ── INIT ──
