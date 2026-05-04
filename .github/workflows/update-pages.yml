@@ -17,10 +17,10 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Set up Node.js 20
+      - name: Set up Node.js 24
         uses: actions/setup-node@v4
         with:
-          node-version: '20'
+          node-version: '24'
 
       - name: Fetch new dorks from GitHub security repos
         env:
@@ -47,7 +47,7 @@ jobs:
           if git diff --staged --quiet; then
             echo "No changes — skipping commit."
           else
-            DORK_COUNT=$(node -e "const d=require('./data/dorks.json');console.log(d.total)")
+            DORK_COUNT=$(node -e "const fs=require('fs');const d=JSON.parse(fs.readFileSync('./data/dorks.json','utf8'));console.log(d.total)")
             git commit -m "chore: auto-update — ${DORK_COUNT} dorks as of $(date -u '+%Y-%m-%d %H:%M UTC')"
             git push
           fi
