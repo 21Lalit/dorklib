@@ -19,6 +19,19 @@ const SOURCES = [
   { repo: 'Ishanoshada/GDorks',                    path: 'README.md',          type: 'readme' },
   { repo: 'TakSec/google-dorks-bug-bounty',        path: 'README.md',          type: 'readme' },
   { repo: 'rootac/dorks-collections',              path: '',                   type: 'readme' },
+  { repo: 'Proviesec/google-dorks',                path: 'README.md',          type: 'readme' },
+  { repo: 'arimogi/Google-Dork-List',              path: 'Google-Dork-List.txt', type: 'raw'  },
+  { repo: 'the-useless-one/theHarvester',          path: 'README.md',          type: 'readme' },
+  { repo: 'smicallef/spiderfoot',                  path: 'README.md',          type: 'readme' },
+  { repo: 'AlessandroZ/LaZagne',                   path: 'README.md',          type: 'readme' },
+  { repo: 'swisskyrepo/PayloadsAllTheThings',      path: 'IDOR/README.md',     type: 'readme' },
+  { repo: 'swisskyrepo/PayloadsAllTheThings',      path: 'File Inclusion/README.md', type: 'readme' },
+  { repo: 'trufflesecurity/trufflehog',            path: 'README.md',          type: 'readme' },
+  { repo: 'daffainfo/AllAboutBugBounty',           path: 'Google Dorking.md',  type: 'raw'    },
+  { repo: 'eslam3kl/SQLiDetector',                 path: 'README.md',          type: 'readme' },
+  { repo: 'MrCl0wnLab/ShellGPT-GoogleHacking',    path: 'README.md',          type: 'readme' },
+  { repo: 'xmendez/wfuzz',                        path: 'README.md',          type: 'readme' },
+  { repo: 'orwagodfather/Google-Dorking',          path: 'README.md',          type: 'readme' },
 ];
 
 function apiGet(urlPath, isRaw = false) {

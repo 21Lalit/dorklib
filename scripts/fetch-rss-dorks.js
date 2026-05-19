@@ -21,6 +21,12 @@ const RSS_FEEDS = [
   'https://threatpost.com/feed/',
   'https://www.darkreading.com/rss.xml',
   'https://feeds.feedburner.com/securityweek',
+  'https://www.securityweek.com/feed/',
+  'https://isc.sans.edu/rssfeed_full.xml',
+  'https://blog.rapid7.com/rss/',
+  'https://portswigger.net/blog/rss',
+  'https://feeds.feedburner.com/HackRead',
+  'https://www.bleepingcomputer.com/feed/',
 ];
 
 function fetchUrl(url) {
@@ -39,12 +45,28 @@ function extractDorksFromText(text) {
   // Look for code blocks or inline code containing Google operators
   const OPERATORS = /\b(site:|inurl:|intitle:|intext:|filetype:|ext:|allintitle:|allinurl:)/i;
   const found = [];
-  // Match <code>...</code> or backtick spans
+
+  // 1. Match <code>...</code> or backtick spans
   const codeBlocks = [...text.matchAll(/<code[^>]*>([^<]{8,300})<\/code>/gi)].map(m => m[1]);
   for (const block of codeBlocks) {
     const q = block.trim().replace(/&amp;/g,'&').replace(/&lt;/g,'<').replace(/&gt;/g,'>').replace(/&#34;/g,'"');
     if (OPERATORS.test(q) && q.length >= 8 && q.length <= 400) found.push(q);
   }
+
+  // 2. Scan plain text lines (strip HTML tags first) for dork-like patterns
+  const plainText = text.replace(/<[^>]+>/g, ' ');
+  const lines = plainText.split(/[\n\r]+/);
+  for (const line of lines) {
+    const q = line.trim()
+      .replace(/&amp;/g,'&').replace(/&lt;/g,'<').replace(/&gt;/g,'>')
+      .replace(/&quot;/g,'"').replace(/&#34;/g,'"').replace(/&#39;/g,"'")
+      .replace(/\s+/g,' ');
+    if (q.length >= 8 && q.length <= 400 && OPERATORS.test(q)
+        && !q.startsWith('http') && !q.startsWith('#')) {
+      found.push(q);
+    }
+  }
+
   return found;
 }
 

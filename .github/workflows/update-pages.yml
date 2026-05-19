@@ -2,8 +2,8 @@ name: Auto-Update DorkLib GitHub Pages
 
 on:
   schedule:
-    # Runs every 6 hours — 00:00, 06:00, 12:00, 18:00 UTC
-    - cron: '0 */6 * * *'
+    # Runs every 12 hours — 00:00, 12:00 UTC
+    - cron: '0 */12 * * *'
   workflow_dispatch:
     # Trigger manually anytime from the Actions tab
 
@@ -29,6 +29,9 @@ jobs:
 
       - name: Fetch new dorks from security RSS feeds
         run: node scripts/fetch-rss-dorks.js
+
+      - name: Fetch new dorks from Exploit-DB GHDB
+        run: node scripts/fetch-exploitdb-dorks.js
 
       - name: Fetch new dorks via Google CSE
         env:
