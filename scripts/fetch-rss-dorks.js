@@ -49,7 +49,8 @@ function extractDorksFromText(text) {
   // 1. Match <code>...</code> or backtick spans
   const codeBlocks = [...text.matchAll(/<code[^>]*>([^<]{8,300})<\/code>/gi)].map(m => m[1]);
   for (const block of codeBlocks) {
-    const q = block.trim().replace(/&amp;/g,'&').replace(/&lt;/g,'<').replace(/&gt;/g,'>').replace(/&#34;/g,'"');
+    const q = block.trim().replace(/&(amp|lt|gt|quot|#34|#39);/g, (_, e) =>
+      ({ amp:'&', lt:'<', gt:'>', quot:'"', '#34':'"', '#39':"'" }[e] || `&${e};`));
     if (OPERATORS.test(q) && q.length >= 8 && q.length <= 400) found.push(q);
   }
 
@@ -58,8 +59,8 @@ function extractDorksFromText(text) {
   const lines = plainText.split(/[\n\r]+/);
   for (const line of lines) {
     const q = line.trim()
-      .replace(/&amp;/g,'&').replace(/&lt;/g,'<').replace(/&gt;/g,'>')
-      .replace(/&quot;/g,'"').replace(/&#34;/g,'"').replace(/&#39;/g,"'")
+      .replace(/&(amp|lt|gt|quot|#34|#39|nbsp);/g, (_, e) =>
+        ({ amp:'&', lt:'<', gt:'>', quot:'"', '#34':'"', '#39':"'", nbsp:' ' }[e] || `&${e};`))
       .replace(/\s+/g,' ');
     if (q.length >= 8 && q.length <= 400 && OPERATORS.test(q)
         && !q.startsWith('http') && !q.startsWith('#')) {

@@ -33,6 +33,9 @@ jobs:
       - name: Fetch new dorks from Exploit-DB GHDB
         run: node scripts/fetch-exploitdb-dorks.js
 
+      - name: Fetch new dorks via web crawling
+        run: node scripts/fetch-webcrawl-dorks.js
+
       - name: Fetch new dorks via Google CSE
         env:
           GOOGLE_CSE_API_KEY: ${{ secrets.GOOGLE_CSE_API_KEY }}

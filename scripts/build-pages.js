@@ -67,7 +67,10 @@ const categories = Object.entries(catMap)
 const TOTAL     = dorks.length;
 const CAT_COUNT = categories.length;
 const FEATURED  = dorks.filter(d => d.featured).slice(0, 6);
-const RECENT    = [...dorks].slice(-6).reverse();
+const RECENT    = [...dorks]
+  .filter(d => d.addedAt)
+  .sort((a, b) => (a.addedAt < b.addedAt ? 1 : -1))
+  .slice(0, 6);
 const DATE      = (updatedAt || new Date().toISOString()).slice(0, 10);
 
 // Embed data safely — no </script> possible, no template literal injection

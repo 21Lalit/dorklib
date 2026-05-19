@@ -29,8 +29,6 @@ const SOURCES = [
   { repo: 'trufflesecurity/trufflehog',            path: 'README.md',          type: 'readme' },
   { repo: 'daffainfo/AllAboutBugBounty',           path: 'Google Dorking.md',  type: 'raw'    },
   { repo: 'eslam3kl/SQLiDetector',                 path: 'README.md',          type: 'readme' },
-  { repo: 'MrCl0wnLab/ShellGPT-GoogleHacking',    path: 'README.md',          type: 'readme' },
-  { repo: 'xmendez/wfuzz',                        path: 'README.md',          type: 'readme' },
   { repo: 'orwagodfather/Google-Dorking',          path: 'README.md',          type: 'readme' },
 ];
 
